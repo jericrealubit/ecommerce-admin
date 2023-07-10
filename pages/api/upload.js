@@ -12,21 +12,20 @@ const handle = async (req, res) => {
       resolve({ fields, files });
     });
   });
-  console.log("length: ", files.file.length);
+
   const client = new S3Client({
+    forcePathStyle: false,
     region: "us-east-1",
     credentials: {
       accessKeyId: process.env.S3_ACCESS_KEY,
-      secrectAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
     },
   });
-  console.log("client: ", client);
 
   const links = [];
   for (const file of files.file) {
     const ext = file.originalFilename.split(".").pop();
     const newFilename = Date.now() + "." + ext;
-    console.log({ ext, file });
     await client.send(
       new PutObjectCommand({
         Bucket: bucketName,
