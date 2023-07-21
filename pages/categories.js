@@ -20,7 +20,14 @@ const Categories = ({ swal }) => {
   };
   const saveCategory = async (ev) => {
     ev.preventDefault();
-    const data = { name, parentCategory };
+    const data = {
+      name,
+      parentCategory,
+      properties: properties.map((p) => ({
+        name: p.name,
+        values: p.values.split(","),
+      })),
+    };
     if (editedCategory) {
       data._id = editedCategory._id;
       await axios.put("/api/categories", data);
@@ -30,6 +37,7 @@ const Categories = ({ swal }) => {
     }
     setName("");
     setParentCategory("");
+    setProperties([]);
     fetchCategories();
   };
 
@@ -37,6 +45,12 @@ const Categories = ({ swal }) => {
     setEditedCategory(category);
     setName(category.name);
     setParentCategory(category.parent?._id);
+    setProperties(
+      category.properties.map(({ name, values }) => ({
+        name,
+        values: values.join(","),
+      }))
+    );
   };
 
   const deleteCategory = (category) => {
@@ -107,15 +121,22 @@ const Categories = ({ swal }) => {
             onChange={(ev) => setParentCategory(ev.target.value)}
           >
             <option value="">No parent category</option>
+            categories
             {categories.length > 0 &&
-              categories.map((category) => (
-                <option value={category._id}>{category.name}</option>
-              ))}
+              categories
+                .filter((category) => category.name !== name) // Current category cannot be assigned as a parent category
+                .map((category) => (
+                  <option value={category._id}>{category.name}</option>
+                ))}
           </select>
         </div>
         <div className="mb-2">
           <label className="block">Properties</label>
-          <button onClick={addProperty} className="btn-default text-sm mb-2">
+          <button
+            onClick={addProperty}
+            type="button"
+            className="btn-default text-sm mb-2"
+          >
             Add new property
           </button>
           {properties.length > 0 &&
@@ -141,6 +162,7 @@ const Categories = ({ swal }) => {
                 />
                 <button
                   onClick={() => removeProperty(index)}
+                  type="button"
                   className="btn-default"
                 >
                   Remove
@@ -148,42 +170,61 @@ const Categories = ({ swal }) => {
               </div>
             ))}
         </div>
-        <button type={"Submit"} className="btn-primary py-1">
-          Save
-        </button>
+        <div className="flex gap-1">
+          {editedCategory && (
+            <button
+              type="button"
+              onClick={() => {
+                setEditedCategory(null);
+                setName("");
+                setParentCategory("");
+                setProperties([]);
+              }}
+              className="btn-default"
+            >
+              Cancel
+            </button>
+          )}
+
+          <button type={"Submit"} className="btn-primary py-1">
+            Save
+          </button>
+        </div>
       </form>
-      <table className="basic mt-4">
-        <thead>
-          <tr>
-            <td>Category name</td>
-            <td>Parent category</td>
-            <td></td>
-          </tr>
-        </thead>
-        <tbody>
-          {categories.length > 0 &&
-            categories.map((category) => (
-              <tr>
-                <td>{category.name}</td>
-                <td>{category?.parent?.name}</td>
-                <td>
-                  <button
-                    onClick={() => editCategory(category)}
-                    className="btn-primary mr-1"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => deleteCategory(category)}
-                    className="btn-primary"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
+      {!editedCategory && (
+        <table className="basic mt-4">
+          <thead>
+            <tr>
+              <td>Category name</td>
+              <td>Parent category</td>
+              <td></td>
+            </tr>
+          </thead>
+          <tbody>
+            {categories.length > 0 &&
+              categories.map((category) => (
+                <tr key={category._id}>
+                  <td>{category.name}</td>
+                  <td>{category?.parent?.name}</td>
+                  <td>
+                    <button
+                      onClick={() => editCategory(category)}
+                      className="btn-primary mr-1"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => deleteCategory(category)}
+                      className="btn-primary"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      )}
     </Layout>
   );
 };

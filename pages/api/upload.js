@@ -3,8 +3,10 @@ import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import fs from "fs";
 import mime from "mime-types";
 const bucketName = "jeric-next-ecommerce";
+import { isAdminRequest } from "./auth/[...nextauth]";
 
 const handle = async (req, res) => {
+  await isAdminRequest(req, res);
   const form = new multiparty.Form();
   const { fields, files } = await new Promise((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
