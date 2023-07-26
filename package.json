@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "set HTTPS=true&&next dev",
-    "build": "npm config set legacy-peer-deps true&&next build",
+    "build": "next build",
     "start": "set HTTPS=true&&next start",
     "lint": "next lint"
   },
