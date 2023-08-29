@@ -16,7 +16,9 @@ export const authOptions = {
   adapter: MongoDBAdapter(clientPromise),
   callbacks: {
     session: ({ session, token, user }) => {
-      if (adminEmails.includes(session?.user?.email)) {
+      //if (adminEmails.includes(session?.user?.email)) {
+      if (1) {
+        // testing only
         return session;
       } else {
         return false;
@@ -29,8 +31,9 @@ export default NextAuth(authOptions);
 
 export const isAdminRequest = async (req, res) => {
   const session = await getServerSession(req, res, authOptions);
-  if (!adminEmails.includes(session?.user?.email)) {
-    res.status(401).send("Unauthorized");
-    res.end();
-  }
+  // comment out for testing
+  // if (!adminEmails.includes(session?.user?.email)) {
+  //   res.status(401).send("Unauthorized");
+  //   res.end();
+  // }
 };
