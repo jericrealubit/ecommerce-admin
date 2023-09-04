@@ -13,6 +13,7 @@ const OrdersPage = () => {
       <table class="basic">
         <thead>
           <th>Date</th>
+          <th>Paid</th>
           <th>Recipient</th>
           <th>Products</th>
         </thead>
@@ -21,6 +22,9 @@ const OrdersPage = () => {
             orders.map((order) => (
               <tr>
                 <td>{new Date(order.createdAt).toLocaleString()}</td>
+                <td className={order.paid ? "text-green-600" : "text-red-600"}>
+                  {order.paid ? "YES" : "NO"}
+                </td>
                 <td>
                   {order.name} {order.email} <br />
                   {order.city} {order.postalCode} {order.country} <br />
@@ -29,7 +33,7 @@ const OrdersPage = () => {
                 <td>
                   {order.line_items.map((l) => (
                     <>
-                      {l.price_data.product_data.name} ={" "}
+                      {l.price_data.product_data.name} = $
                       {l.price_data.unit_amount / 100} X {l.quantity} <br />
                     </>
                   ))}
